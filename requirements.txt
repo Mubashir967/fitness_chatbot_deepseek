@@ -6,4 +6,3 @@ langchain
 langchain-core
 langchain-community
 langchain-openai
-deepseek-openai
