@@ -1,73 +1,29 @@
-from langchain.chat_models import ChatOpenAI
-from langchain.agents import initialize_agent, Tool
-from langchain.agents.agent_types import AgentType
-from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
-import pandas as pd
 import os
+import requests
 from dotenv import load_dotenv
 
-# Load the API key
 load_dotenv()
 
-# Load your datasets
-meals_df = pd.read_csv("datasets/daily_food_nutrition.csv")
-exercises_df = pd.read_csv("datasets/exercise_dataset.csv")
-injuries_df = pd.read_csv("datasets/injury_data.csv")
+def get_bot_response(user_input):
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    url = "https://openrouter.ai/api/v1/chat/completions"
 
-# Create dataframe agents
-meals_agent = create_pandas_dataframe_agent(
-    ChatOpenAI(
-        temperature=0,
-        openai_api_key=os.getenv("OPENROUTER_API_KEY"),
-        openai_api_base="https://openrouter.ai/api/v1",
-        model="mistralai/mistral-7b-instruct"  # You can change to other models
-    ),
-    meals_df,
-    verbose=True
-)
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost:5000",  # or your website domain if hosted
+        "X-Title": "Fitness Chatbot"
+    }
 
-exercise_agent = create_pandas_dataframe_agent(
-    ChatOpenAI(
-        temperature=0,
-        openai_api_key=os.getenv("OPENROUTER_API_KEY"),
-        openai_api_base="https://openrouter.ai/api/v1",
-        model="mistralai/mistral-7b-instruct"
-    ),
-    exercises_df,
-    verbose=True
-)
+    data = {
+        "model": "mistralai/mixtral-8x7b-instruct",
+        "messages": [
+            {"role": "system", "content": "You are a helpful fitness and health assistant."},
+            {"role": "user", "content": user_input}
+        ],
+        "temperature": 0.7
+    }
 
-injury_agent = create_pandas_dataframe_agent(
-    ChatOpenAI(
-        temperature=0,
-        openai_api_key=os.getenv("OPENROUTER_API_KEY"),
-        openai_api_base="https://openrouter.ai/api/v1",
-        model="mistralai/mistral-7b-instruct"
-    ),
-    injuries_df,
-    verbose=True
-)
-
-# Define tools
-tools = [
-    Tool(name="Meal Plan Tool", func=meals_agent.run, description="Provides meal plans"),
-    Tool(name="Workout Tool", func=exercise_agent.run, description="Suggests workouts"),
-    Tool(name="Injury Prevention Tool", func=injury_agent.run, description="Helps with injury prevention"),
-]
-
-# Initialize agent
-agent = initialize_agent(
-    tools, 
-    ChatOpenAI(
-        temperature=0,
-        openai_api_key=os.getenv("OPENROUTER_API_KEY"),
-        openai_api_base="https://openrouter.ai/api/v1",
-        model="mistralai/mistral-7b-instruct"
-    ),
-    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True
-)
-
-# Define response function
-def get_bot_response(user_message):
-    return agent.run(user_message)
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"]
