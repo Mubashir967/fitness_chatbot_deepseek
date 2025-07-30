@@ -1,8 +1,8 @@
-Flask
-flask_cors
+flask
+flask-cors
 python-dotenv
 pandas
 langchain
-langchain-core
-langchain-community
 langchain-openai
+git+https://github.com/deepseek-ai/deepseek-openai.git
+git+https://github.com/langchain-ai/langchain.git@master#subdirectory=libs/experimental
