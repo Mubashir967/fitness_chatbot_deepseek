@@ -23,5 +23,5 @@ def chat():
     return jsonify({"response": response})
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Use Render-provided port if available
+    port = int(os.environ.get("PORT", 4000))  # Use Render-provided port if available
     app.run(host='0.0.0.0', port=port, debug=True)  # Bind to 0.0.0.0 so it's accessible
