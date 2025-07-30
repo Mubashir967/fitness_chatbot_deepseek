@@ -1,7 +1,9 @@
 Flask
-flask-cors
-langchain
-langchain-community
-langchain-experimental
+flask_cors
 python-dotenv
 pandas
+langchain
+langchain-core
+langchain-community
+langchain-openai
+deepseek-openai
