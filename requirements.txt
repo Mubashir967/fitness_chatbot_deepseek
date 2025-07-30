@@ -1,0 +1,7 @@
+Flask
+flask-cors
+langchain
+langchain-community
+langchain-experimental
+python-dotenv
+pandas
