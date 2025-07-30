@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: fitness-chatbot-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        value: 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
+      - key: OPENAI_API_BASE
+        value: https://api.deepseek.com/v1

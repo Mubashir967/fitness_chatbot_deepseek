@@ -3,6 +3,5 @@ flask-cors
 python-dotenv
 pandas
 langchain
-langchain-openai
-git+https://github.com/deepseek-ai/deepseek-openai.git
-git+https://github.com/langchain-ai/langchain.git@master#subdirectory=libs/experimental
+deepseek
+requests

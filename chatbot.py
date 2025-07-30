@@ -1,35 +1,33 @@
-import pandas as pd
+# chatbot.py
+
 import os
+import requests
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langchain.agents import initialize_agent, AgentType
-from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 
 load_dotenv()
 
-# Load DeepSeek API Key
-api_key = os.getenv("DEEPSEEK_API_KEY")
+API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
-# Setup LLM (assuming DeepSeek is OpenAI-compatible)
-llm = ChatOpenAI(
-    api_key=api_key,
-    base_url="https://api.deepseek.com/v1",  # ✅ your DeepSeek API base
-    model="deepseek-chat",  # or r1t2 if required
-    temperature=0.3
-)
+def get_bot_response(user_input):
+    url = "https://api.deepseek.com/v1/chat/completions"
+    
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
 
-# Load your CSVs
-meals_df = pd.read_csv("datasets/daily_food_nutrition.csv")
+    body = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "system", "content": "You are a helpful fitness and nutrition expert."},
+            {"role": "user", "content": user_input}
+        ]
+    }
 
-# Agent with allow_dangerous_code
-meal_agent = create_pandas_dataframe_agent(
-    llm=llm,
-    df=meals_df,
-    verbose=True,
-    agent_type=AgentType.OPENAI_FUNCTIONS,
-    handle_parsing_errors=True,
-    allow_dangerous_code=True  # ✅ Required
-)
-
-def answer_question(query):
-    return meal_agent.run(query)
+    try:
+        response = requests.post(url, headers=headers, json=body)
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        return f"Error: {str(e)}"
