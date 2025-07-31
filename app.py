@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from chatbot import get_bot_response
@@ -18,4 +19,5 @@ def chat():
 
 # Add this to run the app locally (optional for Render, but useful for testing)
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=4000)
+    port = int(os.environ.get("PORT", 5000))
+app.run(host="0.0.0.0", port=port)
